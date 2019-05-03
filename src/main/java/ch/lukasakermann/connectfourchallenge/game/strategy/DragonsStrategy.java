@@ -8,13 +8,42 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import java.util.Map;
+
+final class MyEntry<K, V> implements Map.Entry<K, V> {
+    private final K key;
+    private V value;
+
+    public MyEntry(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    @Override
+    public K getKey() {
+        return key;
+    }
+
+    @Override
+    public V getValue() {
+        return value;
+    }
+
+    @Override
+    public V setValue(V value) {
+        V old = this.value;
+        this.value = value;
+        return old;
+    }
+}
+
 public class DragonsStrategy implements ConnectFourStrategy {
     private static final String EMPTY_CELL = "EMPTY";
     private static final String OWN_TEAM = "Dragons";
     private static String OWN_COLOR;
     private static List<List<String>> board;
     private static Map<Integer, Integer> freeCoordinates;
-    //private static String OWN_COLOR = "RED";
+    //private static String OWN_COLOR = "YELLOW";
 
     @Override
     public int dropDisc(Game game) {
@@ -110,7 +139,7 @@ public class DragonsStrategy implements ConnectFourStrategy {
       * @return
       */
      private static boolean getLeftOne(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
-    	 if(coordinate.getValue() == 0) {
+    	 if(coordinate.getKey() == 0) {
     		 return false;
     	 } else if (board.get(coordinate.getValue()).get(coordinate.getKey()-1).equals(OWN_COLOR)){
     		 return true;
@@ -127,7 +156,8 @@ public class DragonsStrategy implements ConnectFourStrategy {
       * @return
       */
      private static boolean getRightOne(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
-    	 if(coordinate.getValue() == 6) {
+    	 //System.out.println(board.get(coordinate.getValue()).get(coordinate.getKey()+1));
+    	 if(coordinate.getKey() == 6) {
     		 return false;
     	 } else if (board.get(coordinate.getValue()).get(coordinate.getKey()+1).equals(OWN_COLOR)){
     		 return true;
@@ -138,15 +168,21 @@ public class DragonsStrategy implements ConnectFourStrategy {
      }
      
      private static boolean horizontalWin(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 
     	 int countLeft = 0;
     	 int countRight = 0;
-    	 while(getLeftOne(board, coordinate)){
-    		 countLeft++;
-    	 }
-    	 while(getRightOne(board,coordinate)) {
-    		 countRight++;
-    	 }
     	 
+    	 Map.Entry<Integer, Integer> entry = new MyEntry<Integer, Integer>(coordinate.getKey(), coordinate.getValue());
+    	 while(getLeftOne(board, entry)){
+    		 countLeft++;
+    		 entry = new MyEntry<Integer, Integer>(entry.getKey()-1, entry.getValue());
+    		 
+    	 }
+    	 entry = new MyEntry<Integer, Integer>(coordinate.getKey(), coordinate.getValue());
+    	 while(getRightOne(board,entry)) {
+    		 countRight++;
+    		 entry = new MyEntry<Integer, Integer>(entry.getKey()+1, entry.getValue());
+    	 }
     	 if ((countLeft == 3 || countRight == 3) || (countLeft == 2 && countRight == 1) || (countLeft == 1 && countRight == 2)) {
     		 return true;
     	 } else {
@@ -214,6 +250,8 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	testBoard.get(5).set(2, "RED");
     	testBoard.get(5).set(3, "YELLOW");
     	testBoard.get(4).set(3, "YELLOW");
+    	testBoard.get(4).set(2, "YELLOW");
+    	testBoard.get(4).set(1, "YELLOW");
     	
     	System.out.println(testBoard.get(0));
     	System.out.println(testBoard.get(1));
@@ -223,15 +261,17 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	System.out.println(testBoard.get(5));
 
     	//System.out.println(freePlaces(testBoard));
-    	System.out.println(getVertical("RED"));
+    	//System.out.println(getVertical("RED"));
     	
-    	System.out.println(isEmpty());
-    	System.out.println(freePlaces());
+    	//System.out.println(isEmpty());
+    	//System.out.println(freePlaces());
     	
     	Map<Integer,Integer> coordinates = new HashMap<Integer, Integer>();
-    	coordinates.put(1,5);
+    	coordinates.put(0,4);
     	Map.Entry<Integer, Integer> entry = coordinates.entrySet().iterator().next();
-    	System.out.println(getRightOne(testBoard, entry));
+    	//System.out.println(getRightOne(testBoard, entry));
+    	
+    	//System.out.println(horizontalWin(testBoard,entry));
     	//System.out.println(getVertical(testBoard));
     	
     	//System.out.println(isEmpty(testBoard));
