@@ -15,7 +15,7 @@ public class ConnectFourClientApplication {
     public static void main(String[] args) {
         ConnectFourAdapter connectFourAdapter = new ConnectFourAdapter(SERVER_URL);
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        executor.submit(new GameRunner(connectFourAdapter, "Alice", new RandomStrategy(), NUMBER_OF_GAMES));
+        executor.submit(new GameRunner(connectFourAdapter, "Dragons", new RandomStrategy(), NUMBER_OF_GAMES));
         executor.submit(new GameRunner(connectFourAdapter, "Bob", new RandomStrategy(), NUMBER_OF_GAMES));
     }
 }
