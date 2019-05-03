@@ -11,22 +11,23 @@ import java.util.stream.IntStream;
 public class DragonsStrategy implements ConnectFourStrategy {
     private static final String EMPTY_CELL = "EMPTY";
     private static final String OWN_TEAM = "Dragons";
-    private static String OWN_COLOR;
-    //private static String OWN_COLOR = "RED";
+    //private static String OWN_COLOR;
+    private static String OWN_COLOR = "RED";
+    private static List<List<String>> board;
 
     @Override
     public int dropDisc(Game game) {
+    	this.board = game.getBoard();
         List<Player> players = game.getPlayers();
         for (Player p: players) {
             if (p.getPlayerId().equals(OWN_TEAM)) OWN_COLOR = p.getDisc();
         }
 
-        List<List<String>> board = game.getBoard();
-        if(isEmpty(board)) return 3;
+        if(isEmpty()) return 3;
         
         List<String> columns = board.get(0);
 
-        List<Integer> possibilities = getVertical(board);
+        List<Integer> possibilities = getVertical();
         List<Integer> validMoves = IntStream.range(0, columns.size())
                 .boxed()
                 .filter(column -> columns.get(column).equals(EMPTY_CELL))
@@ -47,7 +48,7 @@ public class DragonsStrategy implements ConnectFourStrategy {
      * @param board
      * @return
      */
-     private static List<Integer> getVertical(List<List<String>> board) {
+     private static List<Integer> getVertical() {
     	 List<Integer> possibilities = new ArrayList<>();
     	 Map<Integer, Integer> freePlaces = freePlaces(board);
     	 for (Entry<Integer, Integer> free : freePlaces.entrySet()) {
@@ -61,8 +62,12 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	 }
          return possibilities;
     }
-     
-     private static boolean isEmpty(List<List<String>> board) {
+     /**
+      * Checks whether the board is empty
+      * @param board
+      * @return
+      */
+     private static boolean isEmpty() {
     	 for(int i=0;i<7;i++) {
     		 if(!board.get(5).get(i).equals(EMPTY_CELL)) {
     			 return false;
@@ -71,6 +76,40 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	 return true;
      }
 
+     /**
+      * Check whether the coordinate to the left has OWN_COLOR
+      * @param board
+      * @param coordinate
+      * @return
+      */
+     private static boolean getLeftOne(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 if(coordinate.getValue() == 0) {
+    		 return false;
+    	 } else if (board.get(coordinate.getValue()).get(coordinate.getKey()-1).equals(OWN_COLOR)){
+    		 return true;
+    	 }
+    	 else {
+    		 return false;
+    	 }
+     }
+     
+     /**
+      * Check whether the coordinate to the right has OWN_COLOR
+      * @param board
+      * @param coordinate
+      * @return
+      */
+     private static boolean getRightOne(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 if(coordinate.getValue() == 6) {
+    		 return false;
+    	 } else if (board.get(coordinate.getValue()).get(coordinate.getKey()+1).equals(OWN_COLOR)){
+    		 return true;
+    	 }
+    	 else {
+    		 return false;
+    	 }
+     }
+     
     private static Map<Integer, Integer> freePlaces(List<List<String>> board){
         List<String> columns = board.get(0);
 
@@ -139,10 +178,15 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	System.out.println(testBoard.get(5));
     
     	
-    	//System.out.println(freePlaces(testBoard));
-    	System.out.println(getVertical(testBoard));
+    	System.out.println(freePlaces(testBoard));
     	
-    	System.out.println(isEmpty(testBoard));
+    	Map<Integer,Integer> coordinates = new HashMap<Integer, Integer>();
+    	coordinates.put(1,5);
+    	Map.Entry<Integer, Integer> entry = coordinates.entrySet().iterator().next();
+    	System.out.println(getRightOne(testBoard, entry));
+    	//System.out.println(getVertical(testBoard));
+    	
+    	//System.out.println(isEmpty(testBoard));
 
 	}
 }
