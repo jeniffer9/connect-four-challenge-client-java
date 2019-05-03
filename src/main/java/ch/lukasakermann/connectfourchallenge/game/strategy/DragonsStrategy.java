@@ -190,6 +190,94 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	 }  	 
      }
      
+     private static boolean getRightUp(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 //System.out.println(board.get(coordinate.getValue()).get(coordinate.getKey()+1));
+    	 if(coordinate.getKey() == 6 || coordinate.getValue() == 0) {
+    		 return false;
+    	 } else if (board.get(coordinate.getValue()-1).get(coordinate.getKey()+1).equals(OWN_COLOR)){
+    		 return true;
+    	 }
+    	 else {
+    		 return false;
+    	 }
+     }
+     private static boolean getLeftUp(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 //System.out.println(board.get(coordinate.getValue()).get(coordinate.getKey()+1));
+    	 if(coordinate.getKey() == 0 || coordinate.getValue() == 0) {
+    		 return false;
+    	 } else if (board.get(coordinate.getValue()-1).get(coordinate.getKey()-1).equals(OWN_COLOR)){
+    		 return true;
+    	 }
+    	 else {
+    		 return false;
+    	 }
+     }
+     
+     private static boolean getRightDown(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 //System.out.println(board.get(coordinate.getValue()).get(coordinate.getKey()+1));
+    	 if(coordinate.getKey() == 6 || coordinate.getValue() == 5) {
+    		 return false;
+    	 } else if (board.get(coordinate.getValue()+1).get(coordinate.getKey()+1).equals(OWN_COLOR)){
+    		 return true;
+    	 }
+    	 else {
+    		 return false;
+    	 }
+     }
+     
+     private static boolean getLeftDown(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 //System.out.println(board.get(coordinate.getValue()).get(coordinate.getKey()+1));
+    	 if(coordinate.getKey() == 0 || coordinate.getValue() == 5) {
+    		 return false;
+    	 } else if (board.get(coordinate.getValue()+1).get(coordinate.getKey()-1).equals(OWN_COLOR)){
+    		 return true;
+    	 }
+    	 else {
+    		 return false;
+    	 }
+     }
+     
+     private static boolean diagonalWin(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 
+    	 int countLeftUp = 0;
+    	 int countLeftDown = 0;
+    	 int countRightUp = 0;
+    	 int countRightDown = 0;
+    	 
+    	 Map.Entry<Integer, Integer> entry = new MyEntry<Integer, Integer>(coordinate.getKey(), coordinate.getValue());
+    	 while(getLeftUp(board, entry)){
+    		 countLeftUp++;
+    		 entry = new MyEntry<Integer, Integer>(entry.getKey()-1, entry.getValue()-1);
+    		 
+    	 }
+    	 entry = new MyEntry<Integer, Integer>(coordinate.getKey(), coordinate.getValue());
+    	 while(getLeftDown(board,entry)) {
+    		 countLeftDown++;
+    		 entry = new MyEntry<Integer, Integer>(entry.getKey()-1, entry.getValue()+1);
+    	 }
+    	 entry = new MyEntry<Integer, Integer>(coordinate.getKey(), coordinate.getValue());
+    	 while(getRightUp(board,entry)) {
+    		 countRightUp++;
+    		 entry = new MyEntry<Integer, Integer>(entry.getKey()+1, entry.getValue()-1);
+    	 }
+    	 entry = new MyEntry<Integer, Integer>(coordinate.getKey(), coordinate.getValue());
+    	 while(getRightDown(board,entry)) {
+    		 countRightDown++;
+    		 entry = new MyEntry<Integer, Integer>(entry.getKey()+1, entry.getValue()+1);
+    	 }
+    	 if ((countLeftUp == 3 || countLeftDown == 3 || countRightUp == 3 || countRightDown == 3) || 
+    			 (countLeftUp == 2 && countRightDown == 1) || 
+    			 (countLeftDown == 2 && countRightUp == 1) || 
+    			 (countLeftUp == 1 && countRightDown == 2) || 
+    			 (countLeftDown == 1 && countRightUp == 2)) {
+    		 return true;
+    	 } else {
+    		 return false;
+    	 }  	 
+    	 
+    	 
+     }
+     
     private static Map<Integer, Integer> freePlaces(){
 
         List<String> columns = board.get(0);
@@ -247,11 +335,13 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	testBoard.add(row_5);
 
     	
-    	testBoard.get(5).set(2, "RED");
-    	testBoard.get(5).set(3, "YELLOW");
+    	testBoard.get(5).set(1, "YELLOW");
+    	testBoard.get(5).set(3, "RED");   	
     	testBoard.get(4).set(3, "YELLOW");
     	testBoard.get(4).set(2, "YELLOW");
     	testBoard.get(4).set(1, "YELLOW");
+    	testBoard.get(3).set(4, "RED");
+    	testBoard.get(3).set(3, "YELLOW");
     	
     	System.out.println(testBoard.get(0));
     	System.out.println(testBoard.get(1));
@@ -274,7 +364,7 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	//System.out.println(horizontalWin(testBoard,entry));
     	//System.out.println(getVertical(testBoard));
     	
-    	//System.out.println(isEmpty(testBoard));
+    	System.out.println(horizontalWin(testBoard, entry));
 
 	}
 }
