@@ -4,13 +4,15 @@ import ch.lukasakermann.connectfourchallenge.connectFourService.Game;
 import ch.lukasakermann.connectfourchallenge.connectFourService.Player;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class DragonsStrategy implements ConnectFourStrategy {
     private static final String EMPTY_CELL = "EMPTY";
     private static final String OWN_TEAM = "Dragons";
-    private String OWN_COLOR;
+    private static String OWN_COLOR;
+    //private static String OWN_COLOR = "RED";
 
     @Override
     public int dropDisc(Game game) {
@@ -20,6 +22,8 @@ public class DragonsStrategy implements ConnectFourStrategy {
         }
 
         List<List<String>> board = game.getBoard();
+        if(isEmpty(board)) return 3;
+        
         List<String> columns = board.get(0);
 
         List<Integer> possibilities = getVertical(board);
@@ -38,28 +42,34 @@ public class DragonsStrategy implements ConnectFourStrategy {
         }
     }
 
-     private List<Integer> getVertical(List<List<String>> board) {
-        List<String> columns = board.get(0);
-         List<String> colors = new ArrayList<>(Collections.nCopies(columns.size(), EMPTY_CELL));
-         Set<Integer> taken = new HashSet<>();
-         for (int i = 0; i < board.size(); ++i) {
-             List<String> row = board.get(i);
-             for (int j = 0; j < row.size() && !taken.contains(j); ++j) {
-                 if (!row.get(j).equals(EMPTY_CELL)) {
-                     colors.add(i, row.get(j));
-                     taken.add(i);
-                 }
-             }
-         }
-         System.out.println(OWN_COLOR);
-
-         List<Integer> possibilities = IntStream.range(0, columns.size())
-                 .boxed()
-                 .filter(column -> colors.get(column).equals(OWN_COLOR))
-                 .collect(Collectors.toList());
-
+    /**
+     * Returns all the columns where OUR player has the top stone.
+     * @param board
+     * @return
+     */
+     private static List<Integer> getVertical(List<List<String>> board) {
+    	 List<Integer> possibilities = new ArrayList<>();
+    	 Map<Integer, Integer> freePlaces = freePlaces(board);
+    	 for (Entry<Integer, Integer> free : freePlaces.entrySet()) {
+    		 int columnNum = free.getKey();
+    		 int row = free.getValue();
+    		 if(row != 5) {
+    			 if (board.get(row+1).get(columnNum).equals(OWN_COLOR)) {   				
+    				 possibilities.add(columnNum);
+    			 }   			
+    		 }
+    	 }
          return possibilities;
     }
+     
+     private static boolean isEmpty(List<List<String>> board) {
+    	 for(int i=0;i<7;i++) {
+    		 if(!board.get(5).get(i).equals(EMPTY_CELL)) {
+    			 return false;
+    		 }
+    	 }
+    	 return true;
+     }
 
     private static Map<Integer, Integer> freePlaces(List<List<String>> board){
         List<String> columns = board.get(0);
@@ -110,11 +120,12 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	}
     	
     	testBoard.add(row_0);
-    	testBoard.add(row_0);
-    	testBoard.add(row_0);
-    	testBoard.add(row_0);
+    	testBoard.add(row_1);
+    	testBoard.add(row_2);
+    	testBoard.add(row_3);
     	testBoard.add(row_4);
     	testBoard.add(row_5);
+
     	
     	testBoard.get(5).set(2, "RED");
     	testBoard.get(5).set(3, "YELLOW");
@@ -128,6 +139,10 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	System.out.println(testBoard.get(5));
     
     	
-    	System.out.println(freePlaces(testBoard));
+    	//System.out.println(freePlaces(testBoard));
+    	System.out.println(getVertical(testBoard));
+    	
+    	System.out.println(isEmpty(testBoard));
+
 	}
 }
