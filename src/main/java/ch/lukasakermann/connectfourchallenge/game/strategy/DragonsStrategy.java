@@ -12,21 +12,24 @@ public class DragonsStrategy implements ConnectFourStrategy {
     private static final String EMPTY_CELL = "EMPTY";
     private static final String OWN_TEAM = "Dragons";
     private static String OWN_COLOR;
+    private static List<List<String>> board;
+    private static Map<Integer, Integer> freeCoordinates;
     //private static String OWN_COLOR = "RED";
 
     @Override
     public int dropDisc(Game game) {
+        this.board = game.getBoard();
         List<Player> players = game.getPlayers();
         for (Player p: players) {
             if (p.getPlayerId().equals(OWN_TEAM)) OWN_COLOR = p.getDisc();
         }
 
         List<List<String>> board = game.getBoard();
-        if(isEmpty(board)) return 3;
+        if(isEmpty()) return 3;
         
         List<String> columns = board.get(0);
 
-        List<Integer> possibilities = getVertical(board);
+        List<Integer> possibilities = getVertical(OWN_COLOR);
         List<Integer> validMoves = IntStream.range(0, columns.size())
                 .boxed()
                 .filter(column -> columns.get(column).equals(EMPTY_CELL))
@@ -36,42 +39,67 @@ public class DragonsStrategy implements ConnectFourStrategy {
         //freePlaces(board);
 
         if (possibilities.size() > 0) {
+            for (Map.Entry<Integer, Integer> c : freeCoordinates.entrySet()) {
+                if (get3Vertical(c, OWN_COLOR)) {
+                    return c.getKey();
+                } else {
+                    String enemyColor = OWN_COLOR.equals("RED") ? "YELLOW" : "RED";
+                    if (get3Vertical(c, enemyColor)) {
+                        return c.getKey();
+                    }
+                }
+            }
             return possibilities.get(rand.nextInt(possibilities.size()));
         } else {
             return validMoves.get(rand.nextInt(validMoves.size()));
         }
     }
 
+    private static boolean get3Vertical(Map.Entry<Integer, Integer> e, String color) {
+        int row = e.getValue();
+        int col = e.getKey();
+        if (row <= 2){
+            boolean three = true;
+            for (int i = 1; i < 4 && three; ++i) {
+                if (!board.get(row+i).get(col).equals(color)) {
+                    three = false;
+                }
+            }
+            return three;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isEmpty() {
+        for(int i=0;i<7;i++) {
+            if(!board.get(5).get(i).equals(EMPTY_CELL)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Returns all the columns where OUR player has the top stone.
-     * @param board
      * @return
      */
-     private static List<Integer> getVertical(List<List<String>> board) {
+     private static List<Integer> getVertical(String color) {
     	 List<Integer> possibilities = new ArrayList<>();
-    	 Map<Integer, Integer> freePlaces = freePlaces(board);
+    	 Map<Integer, Integer> freePlaces = freePlaces();
     	 for (Entry<Integer, Integer> free : freePlaces.entrySet()) {
     		 int columnNum = free.getKey();
     		 int row = free.getValue();
     		 if(row != 5) {
-    			 if (board.get(row+1).get(columnNum).equals(OWN_COLOR)) {   				
+    			 if (board.get(row+1).get(columnNum).equals(color)) {
     				 possibilities.add(columnNum);
     			 }   			
     		 }
     	 }
          return possibilities;
     }
-     
-     private static boolean isEmpty(List<List<String>> board) {
-    	 for(int i=0;i<7;i++) {
-    		 if(!board.get(5).get(i).equals(EMPTY_CELL)) {
-    			 return false;
-    		 }
-    	 }
-    	 return true;
-     }
 
-    private static Map<Integer, Integer> freePlaces(List<List<String>> board){
+    private static Map<Integer, Integer> freePlaces(){
         List<String> columns = board.get(0);
 
         List<Integer> validMoves = IntStream.range(0, columns.size())
@@ -90,13 +118,13 @@ public class DragonsStrategy implements ConnectFourStrategy {
             	free.put(key, 5);
             }
         }
-        for (Map.Entry<Integer, Integer> e : free.entrySet()) {
-            System.out.println(e.getKey() + " " + e.getValue());
-        }
+
+        freeCoordinates = free;
+
         return free;
     }
 
-    private List<Integer> getHorizontal(List<List<String>> board) {
+    private List<Integer> getHorizontal() {
         return null;
     }
     
@@ -140,9 +168,9 @@ public class DragonsStrategy implements ConnectFourStrategy {
     
     	
     	//System.out.println(freePlaces(testBoard));
-    	System.out.println(getVertical(testBoard));
+    	System.out.println(getVertical("RED"));
     	
-    	System.out.println(isEmpty(testBoard));
+    	System.out.println(isEmpty());
 
 	}
 }
