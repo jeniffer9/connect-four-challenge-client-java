@@ -9,13 +9,14 @@ import java.util.stream.IntStream;
 
 public class DragonsStrategy implements ConnectFourStrategy {
     private static final String EMPTY_CELL = "EMPTY";
+    private static final String OWN_TEAM = "Dragons";
     private String OWN_COLOR;
 
     @Override
     public int dropDisc(Game game) {
         List<Player> players = game.getPlayers();
         for (Player p: players) {
-            if (p.getPlayerId().equals("Alice")) OWN_COLOR = p.getDisc();
+            if (p.getPlayerId().equals(OWN_TEAM)) OWN_COLOR = p.getDisc();
         }
 
         List<List<String>> board = game.getBoard();
