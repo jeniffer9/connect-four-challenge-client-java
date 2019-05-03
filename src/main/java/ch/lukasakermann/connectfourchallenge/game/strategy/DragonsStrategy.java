@@ -110,6 +110,23 @@ public class DragonsStrategy implements ConnectFourStrategy {
     	 }
      }
      
+     private static boolean horizontalWin(List<List<String>> board, Map.Entry<Integer, Integer> coordinate) {
+    	 int countLeft = 0;
+    	 int countRight = 0;
+    	 while(getLeftOne(board, coordinate)){
+    		 countLeft++;
+    	 }
+    	 while(getRightOne(board,coordinate)) {
+    		 countRight++;
+    	 }
+    	 
+    	 if ((countLeft == 3 || countRight == 3) || (countLeft == 2 && countRight == 1) || (countLeft == 1 && countRight == 2)) {
+    		 return true;
+    	 } else {
+    		 return false;
+    	 }  	 
+     }
+     
     private static Map<Integer, Integer> freePlaces(List<List<String>> board){
         List<String> columns = board.get(0);
 
